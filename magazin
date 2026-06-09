@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopKG — Онлайн Дүкөн</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --primary: #2563EB;
+    --primary-dark: #1D4ED8;
+    --accent: #F59E0B;
+    --bg: #F8FAFC;
+    --white: #ffffff;
+    --text: #1E293B;
+    --muted: #64748B;
+    --border: #E2E8F0;
+    --radius: 12px;
+  }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+
+  /* HEADER */
+  header { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,0.06); }
+  .header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 20px; padding: 14px 20px; }
+  .logo { font-size: 22px; font-weight: 800; color: var(--primary); text-decoration: none; letter-spacing: -0.5px; cursor: pointer; }
+  .logo span { color: var(--accent); }
+  .search-bar { flex: 1; display: flex; border: 1.5px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg); }
+  .search-bar input { flex: 1; padding: 10px 14px; border: none; background: transparent; font-size: 14px; outline: none; color: var(--text); }
+  .search-bar button { padding: 10px 18px; background: var(--primary); color: white; border: none; cursor: pointer; font-size: 14px; font-weight: 600; transition: background 0.2s; }
+  .search-bar button:hover { background: var(--primary-dark); }
+  .header-actions { display: flex; gap: 10px; }
+  .btn-icon { display: flex; align-items: center; gap: 6px; padding: 9px 16px; border: 1.5px solid var(--border); border-radius: 8px; background: white; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text); text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+  .btn-icon:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-icon.cart { background: var(--primary); color: white; border-color: var(--primary); }
+  .btn-icon.cart:hover { background: var(--primary-dark); }
+  .badge { background: var(--accent); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+  /* NAV */
+  nav { background: var(--primary); }
+  .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; padding: 0 20px; overflow-x: auto; }
+  nav a { color: rgba(255,255,255,0.85); text-decoration: none; padding: 12px 16px; font-size: 14px; font-weight: 500; transition: all 0.2s; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; display: block; }
+  nav a:hover { color: white; background: rgba(255,255,255,0.1); }
+  nav a.active { color: white; background: rgba(255,255,255,0.15); border-bottom-color: var(--accent); }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 60%, #60A5FA 100%); color: white; padding: 60px 20px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; right: -50px; top: -80px; width: 400px; height: 400px; border-radius: 50%; background: rgba(255,255,255,0.06); }
+  .hero-inner { max-width: 1200px; margin: 0 auto; position: relative; }
+  .hero-badge { display: inline-block; background: var(--accent); color: white; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 16px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .hero h1 { font-size: 42px; font-weight: 800; line-height: 1.2; margin-bottom: 14px; }
+  .hero p { font-size: 18px; opacity: 0.85; margin-bottom: 28px; max-width: 480px; }
+  .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary { background: white; color: var(--primary); padding: 13px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 15px; transition: all 0.2s; display: inline-block; cursor: pointer; border: none; }
+  .btn-primary:hover { background: var(--accent); color: white; transform: translateY(-1px); }
+  .btn-outline { border: 2px solid rgba(255,255,255,0.6); color: white; padding: 13px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; transition: all 0.2s; display: inline-block; background: none; cursor: pointer; }
+  .btn-outline:hover { background: rgba(255,255,255,0.15); }
+
+  /* STATS */
+  .stats-bar { background: white; border-bottom: 1px solid var(--border); padding: 14px 20px; }
+  .stats-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 22px; font-weight: 800; color: var(--primary); }
+  .stat-label { font-size: 12px; color: var(--muted); }
+
+  /* MAIN */
+  main { max-width: 1200px; margin: 0 auto; padding: 32px 20px; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .section-title { font-size: 22px; font-weight: 700; }
+  .section-title span { color: var(--primary); }
+  .see-all { color: var(--primary); text-decoration: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .see-all:hover { text-decoration: underline; }
+
+  /* CATEGORIES */
+  .categories { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; margin-bottom: 40px; }
+  .category-card { background: white; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 18px 12px; text-align: center; cursor: pointer; transition: all 0.2s; text-decoration: none; color: var(--text); }
+  .category-card:hover, .category-card.active { border-color: var(--primary); box-shadow: 0 2px 12px rgba(37,99,235,0.15); transform: translateY(-2px); background: #EFF6FF; }
+  .category-card .icon { font-size: 28px; margin-bottom: 8px; }
+  .category-card .name { font-size: 13px; font-weight: 600; }
+
+  /* PRODUCTS GRID */
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px; }
+  .product-card { background: white; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); transition: all 0.25s; cursor: pointer; }
+  .product-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.12); transform: translateY(-3px); }
+  .product-img { aspect-ratio: 1; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 64px; position: relative; overflow: hidden; }
+  .badge-new { position: absolute; top: 10px; left: 10px; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; background: #10B981; color: white; }
+  .badge-sale { position: absolute; top: 10px; left: 10px; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; background: #EF4444; color: white; }
+  .badge-hot { background: var(--accent); color: white; position: absolute; top: 10px; left: 10px; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+  .wishlist-btn { position: absolute; top: 10px; right: 10px; background: white; border: 1px solid var(--border); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; transition: all 0.2s; }
+  .wishlist-btn:hover { background: #FEF2F2; border-color: #EF4444; }
+  .product-info { padding: 14px; }
+  .product-brand { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .product-name { font-size: 14px; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+  .stars { color: var(--accent); font-size: 13px; margin-bottom: 6px; }
+  .stars span { color: var(--muted); font-size: 12px; }
+  .price-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .price { font-size: 18px; font-weight: 800; color: var(--primary); }
+  .price-old { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+  .discount { font-size: 12px; color: #EF4444; font-weight: 700; }
+  .add-btn { width: 100%; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .add-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .add-btn:active { transform: scale(0.98); }
+
+  /* PROMO */
+  .promo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px; }
+  .promo-card { border-radius: var(--radius); padding: 28px; color: white; display: flex; flex-direction: column; justify-content: space-between; min-height: 150px; position: relative; overflow: hidden; }
+  .promo-card.orange { background: linear-gradient(135deg, #F59E0B, #EF4444); }
+  .promo-card.green { background: linear-gradient(135deg, #10B981, #059669); }
+  .promo-card h3 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .promo-card p { font-size: 13px; opacity: 0.9; margin-bottom: 16px; }
+  .promo-btn { display: inline-block; background: rgba(255,255,255,0.25); color: white; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; border: 1px solid rgba(255,255,255,0.4); transition: all 0.2s; width: fit-content; cursor: pointer; }
+  .promo-btn:hover { background: rgba(255,255,255,0.4); }
+  .promo-icon { font-size: 60px; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); opacity: 0.3; }
+
+  /* ===== ELECTRONICS PAGE ===== */
+  .elec-hero { background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 60%, #2563EB 100%); color: white; padding: 40px 20px; }
+  .elec-hero-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+  .elec-hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+  .elec-hero p { opacity: 0.8; font-size: 15px; }
+  .elec-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+  .elec-stat { text-align: center; background: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 10px; }
+  .elec-stat-num { font-size: 20px; font-weight: 800; }
+  .elec-stat-label { font-size: 11px; opacity: 0.75; }
+
+  /* Breadcrumb */
+  .breadcrumb { max-width: 1200px; margin: 0 auto; padding: 14px 20px; font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+  .breadcrumb a { color: var(--primary); text-decoration: none; cursor: pointer; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  /* Layout */
+  .elec-layout { max-width: 1200px; margin: 0 auto; padding: 0 20px 40px; display: grid; grid-template-columns: 240px 1fr; gap: 24px; }
+
+  /* SIDEBAR */
+  .sidebar { }
+  .filter-box { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+  .filter-box h3 { font-size: 14px; font-weight: 700; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .filter-option { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; cursor: pointer; }
+  .filter-option input[type="checkbox"] { accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer; }
+  .filter-option label { font-size: 13px; cursor: pointer; flex: 1; color: var(--text); }
+  .filter-option .count { font-size: 11px; color: var(--muted); background: var(--bg); padding: 1px 6px; border-radius: 10px; }
+  .price-range { margin-top: 8px; }
+  .price-range input[type="range"] { width: 100%; accent-color: var(--primary); }
+  .price-inputs { display: flex; gap: 8px; margin-top: 8px; }
+  .price-inputs input { flex: 1; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; text-align: center; outline: none; }
+  .price-inputs input:focus { border-color: var(--primary); }
+  .apply-filter { width: 100%; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
+  .apply-filter:hover { background: var(--primary-dark); }
+  .clear-filters { width: 100%; padding: 8px; background: none; color: var(--muted); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; cursor: pointer; margin-top: 6px; transition: all 0.2s; }
+  .clear-filters:hover { border-color: #EF4444; color: #EF4444; }
+
+  /* Sub-categories */
+  .sub-cats { display: flex; flex-direction: column; gap: 4px; }
+  .sub-cat { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text); transition: all 0.2s; }
+  .sub-cat:hover { background: #EFF6FF; color: var(--primary); }
+  .sub-cat.active { background: #EFF6FF; color: var(--primary); font-weight: 600; }
+  .sub-cat .s-icon { font-size: 18px; }
+  .sub-cat .s-count { margin-left: auto; font-size: 11px; color: var(--muted); }
+
+  /* PRODUCTS AREA */
+  .products-area { }
+  .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .toolbar-left { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .result-count { font-size: 14px; color: var(--muted); }
+  .result-count strong { color: var(--text); }
+  .active-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-tag { display: flex; align-items: center; gap: 4px; background: #EFF6FF; color: var(--primary); border: 1px solid #BFDBFE; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .filter-tag button { background: none; border: none; cursor: pointer; color: var(--primary); font-size: 14px; line-height: 1; padding: 0; }
+  .sort-select { padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; background: white; cursor: pointer; outline: none; color: var(--text); }
+  .sort-select:focus { border-color: var(--primary); }
+  .view-btns { display: flex; gap: 4px; }
+  .view-btn { width: 34px; height: 34px; border: 1.5px solid var(--border); background: white; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.2s; }
+  .view-btn.active, .view-btn:hover { border-color: var(--primary); background: #EFF6FF; }
+
+  /* GRID vs LIST */
+  .elec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .elec-grid.list-view { grid-template-columns: 1fr; }
+  .elec-grid.list-view .product-card { display: flex; flex-direction: row; }
+  .elec-grid.list-view .product-img { width: 160px; min-width: 160px; aspect-ratio: auto; height: 160px; }
+  .elec-grid.list-view .product-info { flex: 1; }
+  .elec-grid.list-view .product-name { font-size: 16px; }
+
+  /* PRODUCT DETAIL */
+  .product-detail { max-width: 1200px; margin: 0 auto; padding: 20px 20px 40px; display: none; }
+  .product-detail.active { display: block; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+  .detail-img { background: white; border: 1px solid var(--border); border-radius: var(--radius); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 120px; }
+  .detail-info { }
+  .detail-brand { font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; margin-bottom: 6px; }
+  .detail-name { font-size: 26px; font-weight: 800; margin-bottom: 12px; line-height: 1.3; }
+  .detail-stars { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .detail-stars .stars-big { font-size: 18px; color: var(--accent); }
+  .detail-stars .review-count { font-size: 13px; color: var(--primary); }
+  .detail-price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; padding: 16px; background: #EFF6FF; border-radius: 10px; }
+  .detail-price { font-size: 32px; font-weight: 800; color: var(--primary); }
+  .detail-price-old { font-size: 18px; color: var(--muted); text-decoration: line-through; }
+  .detail-discount { background: #EF4444; color: white; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 700; }
+  .detail-specs { margin-bottom: 20px; }
+  .detail-specs h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .spec-row { display: flex; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .spec-key { width: 140px; color: var(--muted); flex-shrink: 0; }
+  .spec-val { font-weight: 500; }
+  .detail-actions { display: flex; gap: 12px; margin-bottom: 20px; }
+  .btn-add-large { flex: 1; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .btn-add-large:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .btn-wish-large { padding: 14px 18px; border: 1.5px solid var(--border); background: white; border-radius: 10px; font-size: 20px; cursor: pointer; transition: all 0.2s; }
+  .btn-wish-large:hover { border-color: #EF4444; background: #FEF2F2; }
+  .delivery-info { background: var(--bg); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .delivery-row { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; }
+  .delivery-row .d-icon { font-size: 18px; }
+  .delivery-row strong { display: block; font-size: 13px; margin-bottom: 2px; }
+  .delivery-row span { color: var(--muted); font-size: 12px; }
+
+  /* TABS */
+  .detail-tabs { margin-top: 32px; }
+  .tab-btns { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+  .tab-btn { padding: 12px 20px; background: none; border: none; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .tab-content { display: none; font-size: 14px; line-height: 1.8; color: var(--text); }
+  .tab-content.active { display: block; }
+  .review-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+  .review-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .reviewer { font-weight: 600; font-size: 14px; }
+  .review-date { font-size: 12px; color: var(--muted); }
+  .review-text { font-size: 13px; color: var(--text); line-height: 1.6; }
+
+  /* PAGINATION */
+  .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 24px; }
+  .page-btn { width: 36px; height: 36px; border: 1.5px solid var(--border); background: white; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .page-btn:hover, .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  /* FOOTER */
+  footer { background: #1E293B; color: rgba(255,255,255,0.7); margin-top: 40px; }
+  .footer-inner { max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px; }
+  .footer-logo { font-size: 24px; font-weight: 800; color: white; margin-bottom: 12px; }
+  .footer-logo span { color: var(--accent); }
+  .footer-desc { font-size: 13px; line-height: 1.7; margin-bottom: 16px; }
+  .footer-social { display: flex; gap: 10px; }
+  .social-link { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 16px; transition: all 0.2s; cursor: pointer; }
+  .social-link:hover { background: var(--primary); }
+  footer h4 { color: white; font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+  footer ul { list-style: none; }
+  footer ul li { margin-bottom: 8px; }
+  footer ul li a { color: rgba(255,255,255,0.65); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+  footer ul li a:hover { color: white; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding: 16px 20px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.4); }
+
+  /* NOTIFICATION */
+  .notification { position: fixed; bottom: 24px; right: 24px; background: #1E293B; color: white; padding: 14px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px; z-index: 999; transform: translateY(80px); opacity: 0; transition: all 0.35s; box-shadow: 0 8px 32px rgba(0,0,0,0.25); }
+  .notification.show { transform: translateY(0); opacity: 1; }
+
+  /* NO RESULTS */
+  .no-results { text-align: center; padding: 60px 20px; }
+  .no-results .no-icon { font-size: 60px; margin-bottom: 16px; }
+  .no-results h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .no-results p { color: var(--muted); font-size: 14px; }
+
+  @media (max-width: 900px) {
+    .elec-layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 28px; }
+    .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .promo-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    .search-bar { display: none; }
+    .elec-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo" onclick="showPage('home')">Shop<span>KG</span></div>
+    <div class="search-bar">
+      <input type="text" placeholder="Товар, бренд же категория издөө..." id="searchInput" onkeyup="handleSearch(event)">
+      <button onclick="doSearch()">🔍 Издөө</button>
+    </div>
+    <div class="header-actions">
+      <div class="btn-icon">❤️ Тандалгылар</div>
+      <div class="btn-icon cart" onclick="showNotification('🛒 Себетиңизде ' + cartCount + ' товар бар')">🛒 Себет <span class="badge" id="cartBadge">3</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a onclick="showPage('home')" class="active" id="nav-home">🏠 Башкы бет</a>
+    <a onclick="showElec('all')" id="nav-elec">📱 Электроника</a>
+    <a onclick="showPage('home')">👗 Кийим-кечек</a>
+    <a onclick="showPage('home')">🏠 Үй буюмдары</a>
+    <a onclick="showPage('home')">🎮 Оюн-зоок</a>
+    <a onclick="showPage('home')">💄 Косметика</a>
+    <a onclick="showPage('home')">🏃 Спорт</a>
+    <a onclick="showPage('home')">🔥 Акциялар</a>
+  </div>
+</nav>
+
+<!-- ==================== HOME PAGE ==================== -->
+<div class="page active" id="page-home">
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">🔥 Жаңы коллекция — 2025</div>
+      <h1>Мыкты товарлар<br>эң жакшы баада!</h1>
+      <p>Кыргызстандын эң чоң онлайн дүкөнү. 50,000+ товар, тез жеткирүү, коргоолуу төлөм.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showElec('all')">🛍️ Сатып алуу</button>
+        <button class="btn-outline" onclick="showElec('all')">📦 Акциялар</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat"><div class="stat-num">50K+</div><div class="stat-label">Товар</div></div>
+      <div class="stat"><div class="stat-num">120K+</div><div class="stat-label">Кардар</div></div>
+      <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Колдоо</div></div>
+      <div class="stat"><div class="stat-num">1-3 күн</div><div class="stat-label">Жеткирүү</div></div>
+      <div class="stat"><div class="stat-num">98%</div><div class="stat-label">Канааттануу</div></div>
+    </div>
+  </div>
+
+  <main>
+    <div class="section-header">
+      <h2 class="section-title">Категориялар боюнча <span>сатып алуу</span></h2>
+    </div>
+    <div class="categories">
+      <div class="category-card" onclick="showElec('phones')"><div class="icon">📱</div><div class="name">Телефондор</div></div>
+      <div class="category-card" onclick="showElec('laptops')"><div class="icon">💻</div><div class="name">Ноутбуктар</div></div>
+      <div class="category-card" onclick="showPage('home')"><div class="icon">👗</div><div class="name">Кийим</div></div>
+      <div class="category-card" onclick="showPage('home')"><div class="icon">👟</div><div class="name">Бут кийим</div></div>
+      <div class="category-card" onclick="showPage('home')"><div class="icon">🍳</div><div class="name">Ашкана</div></div>
+      <div class="category-card" onclick="showElec('gaming')"><div class="icon">🎮</div><div class="name">Оюндар</div></div>
+      <div class="category-card" onclick="showPage('home')"><div class="icon">💄</div><div class="name">Косметика</div></div>
+      <div class="category-card" onclick="showPage('home')"><div class="icon">📚</div><div class="name">Китептер</div></div>
+      <div class="category-card" onclick="showPage('home')"><div class="icon">🏋️</div><div class="name">Спорт</div></div>
+      <div class="category-card" onclick="showPage('home')"><div class="icon">🚗</div><div class="name">Авто</div></div>
+    </div>
+
+    <div class="section-header">
+      <h2 class="section-title">🔥 <span>Хит</span> товарлар</h2>
+      <span class="see-all" onclick="showElec('all')">Баарын көрүү →</span>
+    </div>
+    <div class="products-grid" id="home-products"></div>
+
+    <div class="promo-grid">
+      <div class="promo-card orange">
+        <div>
+          <h3>Жазгы акция! 🌸</h3>
+          <p>Электроника категориясынан 30% чейин арзандатуу. Чектелген убакыт!</p>
+          <span class="promo-btn" onclick="showElec('all')">Акцияга өтүү →</span>
+        </div>
+        <span class="promo-icon">⚡</span>
+      </div>
+      <div class="promo-card green">
+        <div>
+          <h3>Акысыз жеткирүү 🚀</h3>
+          <p>5000 сомдон жогору заказ кылсаңыз, жеткирүү акысыз! Бүгүн гана.</p>
+          <span class="promo-btn" onclick="showElec('all')">Дароо заказ кылуу →</span>
+        </div>
+        <span class="promo-icon">📦</span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ==================== ELECTRONICS PAGE ==================== -->
+<div class="page" id="page-elec">
+
+  <div class="elec-hero">
+    <div class="elec-hero-inner">
+      <div>
+        <h1>📱 Электроника</h1>
+        <p>Мыкты брендлердин техникасы — коргоолуу жана арзан баада</p>
+      </div>
+      <div class="elec-stats">
+        <div class="elec-stat"><div class="elec-stat-num">1 200+</div><div class="elec-stat-label">Товар</div></div>
+        <div class="elec-stat"><div class="elec-stat-num">50+</div><div class="elec-stat-label">Бренд</div></div>
+        <div class="elec-stat"><div class="elec-stat-num">до 24 ай</div><div class="elec-stat-label">Бөлүп төлөө</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="breadcrumb">
+    <a onclick="showPage('home')">Башкы бет</a> › <span id="bread-cat">Электроника</span>
+  </div>
+
+  <div class="elec-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="filter-box">
+        <h3>📂 Категориялар</h3>
+        <div class="sub-cats">
+          <div class="sub-cat active" id="sc-all" onclick="filterSubCat('all')"><span class="s-icon">⚡</span> Баары <span class="s-count">1200</span></div>
+          <div class="sub-cat" id="sc-phones" onclick="filterSubCat('phones')"><span class="s-icon">📱</span> Смартфондор <span class="s-count">320</span></div>
+          <div class="sub-cat" id="sc-laptops" onclick="filterSubCat('laptops')"><span class="s-icon">💻</span> Ноутбуктар <span class="s-count">185</span></div>
+          <div class="sub-cat" id="sc-tablets" onclick="filterSubCat('tablets')"><span class="s-icon">📟</span> Планшеттер <span class="s-count">94</span></div>
+          <div class="sub-cat" id="sc-audio" onclick="filterSubCat('audio')"><span class="s-icon">🎧</span> Аудио <span class="s-count">210</span></div>
+          <div class="sub-cat" id="sc-watches" onclick="filterSubCat('watches')"><span class="s-icon">⌚</span> Смарт саат <span class="s-count">76</span></div>
+          <div class="sub-cat" id="sc-cameras" onclick="filterSubCat('cameras')"><span class="s-icon">📷</span> Камералар <span class="s-count">63</span></div>
+          <div class="sub-cat" id="sc-gaming" onclick="filterSubCat('gaming')"><span class="s-icon">🎮</span> Оюн консолу <span class="s-count">88</span></div>
+          <div class="sub-cat" id="sc-accessories" onclick="filterSubCat('accessories')"><span class="s-icon">🔌</span> Аксессуарлар <span class="s-count">164</span></div>
+        </div>
+      </div>
+
+      <div class="filter-box">
+        <h3>💰 Баа (сом)</h3>
+        <div class="price-range">
+          <input type="range" min="500" max="200000" value="200000" id="priceSlider" oninput="updatePriceMax(this.value)">
+        </div>
+        <div class="price-inputs">
+          <input type="number" value="500" id="priceMin" placeholder="Минимум">
+          <input type="number" value="200000" id="priceMax" placeholder="Максимум">
+        </div>
+        <button class="apply-filter" onclick="applyFilters()">Колдонуу</button>
+      </div>
+
+      <div class="filter-box">
+        <h3>🏷️ Бренд</h3>
+        <div class="filter-option"><input type="checkbox" id="b-apple" onchange="applyFilters()"><label for="b-apple">Apple</label><span class="count">143</span></div>
+        <div class="filter-option"><input type="checkbox" id="b-samsung" onchange="applyFilters()"><label for="b-samsung">Samsung</label><span class="count">201</span></div>
+        <div class="filter-option"><input type="checkbox" id="b-xiaomi" onchange="applyFilters()"><label for="b-xiaomi">Xiaomi</label><span class="count">178</span></div>
+        <div class="filter-option"><input type="checkbox" id="b-sony" onchange="applyFilters()"><label for="b-sony">Sony</label><span class="count">95</span></div>
+        <div class="filter-option"><input type="checkbox" id="b-lg" onchange="applyFilters()"><label for="b-lg">LG</label><span class="count">67</span></div>
+        <div class="filter-option"><input type="checkbox" id="b-huawei" onchange="applyFilters()"><label for="b-huawei">Huawei</label><span class="count">89</span></div>
+        <button class="clear-filters" onclick="clearFilters()">✕ Тазалоо</button>
+      </div>
+
+      <div class="filter-box">
+        <h3>⭐ Рейтинг</h3>
+        <div class="filter-option"><input type="checkbox" id="r5" onchange="applyFilters()"><label for="r5">★★★★★ (5.0)</label><span class="count">89</span></div>
+        <div class="filter-option"><input type="checkbox" id="r4" onchange="applyFilters()"><label for="r4">★★★★☆ (4+)</label><span class="count">342</span></div>
+        <div class="filter-option"><input type="checkbox" id="r3" onchange="applyFilters()"><label for="r3">★★★☆☆ (3+)</label><span class="count">198</span></div>
+      </div>
+
+      <div class="filter-box">
+        <h3>🏷️ Акциялар</h3>
+        <div class="filter-option"><input type="checkbox" id="f-sale" onchange="applyFilters()"><label for="f-sale">Скидкалар бар</label></div>
+        <div class="filter-option"><input type="checkbox" id="f-new" onchange="applyFilters()"><label for="f-new">Жаңы товарлар</label></div>
+        <div class="filter-option"><input type="checkbox" id="f-instock" onchange="applyFilters()"><label for="f-instock">Складда бар</label></div>
+      </div>
+    </aside>
+
+    <!-- PRODUCTS AREA -->
+    <div class="products-area">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <span class="result-count" id="resultCount"><strong>48</strong> товар табылды</span>
+          <div class="active-filters" id="activeFilters"></div>
+        </div>
+        <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+          <option value="popular">Популярдуулугу боюнча</option>
+          <option value="price-asc">Баасы: арзандан кымбатка</option>
+          <option value="price-desc">Баасы: кымбаттан арзанга</option>
+          <option value="rating">Рейтинг боюнча</option>
+          <option value="new">Жаңылары алдыда</option>
+        </select>
+        <div class="view-btns">
+          <button class="view-btn active" id="gridViewBtn" onclick="setView('grid')" title="Тор">⊞</button>
+          <button class="view-btn" id="listViewBtn" onclick="setView('list')" title="Тизме">☰</button>
+        </div>
+      </div>
+
+      <div class="elec-grid" id="elecGrid"></div>
+
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PRODUCT DETAIL PAGE ==================== -->
+<div class="page" id="page-detail">
+  <div class="breadcrumb">
+    <a onclick="showPage('home')">Башкы бет</a> › <a onclick="showElec('all')">Электроника</a> › <span id="detail-bread">Товар</span>
+  </div>
+  <div class="product-detail active" id="productDetail"></div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Shop<span>KG</span></div>
+      <p class="footer-desc">Кыргызстандын эң ишенимдүү онлайн дүкөнү. Мыкты баада, коргоолуу жана тез.</p>
+      <div class="footer-social">
+        <span class="social-link">📘</span>
+        <span class="social-link">📸</span>
+        <span class="social-link">💬</span>
+        <span class="social-link">▶️</span>
+      </div>
+    </div>
+    <div>
+      <h4>Кардарларга</h4>
+      <ul><li><a href="#">Кантип заказ кылуу</a></li><li><a href="#">Жеткирүү</a></li><li><a href="#">Кайтаруу</a></li><li><a href="#">Гарантия</a></li><li><a href="#">Жардам</a></li></ul>
+    </div>
+    <div>
+      <h4>Компания</h4>
+      <ul><li><a href="#">Биз жөнүндө</a></li><li><a href="#">Жумуш</a></li><li><a href="#">Блог</a></li><li><a href="#">Байланыш</a></li></ul>
+    </div>
+    <div>
+      <h4>Байланыш</h4>
+      <ul><li><a href="#">📞 +996 (312) 00-00-00</a></li><li><a href="#">✉️ info@shopkg.kg</a></li><li><a href="#">📍 Бишкек, Чүй 123</a></li><li><a href="#">⏰ Дн-Жм: 9:00-18:00</a></li></ul>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2025 ShopKG. Бардык укуктар корголгон.</div>
+</footer>
+
+<div class="notification" id="notification">
+  <span id="notif-text">✅ Себетке кошулду!</span>
+</div>
+
+<script>
+// ===== DATA =====
+const products = [
+  { id:1, name:'iPhone 15 Pro Max 256GB', brand:'Apple', cat:'phones', price:109900, oldPrice:124900, rating:5, reviews:512, icon:'📱', badge:'sale', isNew:false, inStock:true, specs:{Экран:'6.7" Super Retina XDR', Процессор:'Apple A17 Pro', RAM:'8 GB', Сактагыч:'256 GB', Камера:'48 MP + 12 MP + 12 MP', Батарея:'4422 mAh', OS:'iOS 17'} },
+  { id:2, name:'Samsung Galaxy S24 Ultra 512GB', brand:'Samsung', cat:'phones', price:128000, oldPrice:145000, rating:5, reviews:389, icon:'📱', badge:'sale', isNew:false, inStock:true, specs:{Экран:'6.8" Dynamic AMOLED 2X', Процессор:'Snapdragon 8 Gen 3', RAM:'12 GB', Сактагыч:'512 GB', Камера:'200 MP', Батарея:'5000 mAh', OS:'Android 14'} },
+  { id:3, name:'Xiaomi 14 Pro 256GB', brand:'Xiaomi', cat:'phones', price:64900, oldPrice:null, rating:4, reviews:201, icon:'📱', badge:'new', isNew:true, inStock:true, specs:{Экран:'6.73" LTPO AMOLED', Процессор:'Snapdragon 8 Gen 3', RAM:'12 GB', Сактагыч:'256 GB', Камера:'50 MP Leica', Батарея:'4880 mAh', OS:'Android 14'} },
+  { id:4, name:'Samsung Galaxy A55 5G 256GB', brand:'Samsung', cat:'phones', price:22900, oldPrice:27000, rating:5, reviews:284, icon:'📱', badge:'hot', isNew:false, inStock:true, specs:{Экран:'6.6" Super AMOLED', Процессор:'Exynos 1480', RAM:'8 GB', Сактагыч:'256 GB', Камера:'50 MP', Батарея:'5000 mAh', OS:'Android 14'} },
+  { id:5, name:'Realme 12 Pro+ 256GB', brand:'Realme', cat:'phones', price:28500, oldPrice:32000, rating:4, reviews:156, icon:'📱', badge:'sale', isNew:false, inStock:true, specs:{Экран:'6.7" AMOLED', Процессор:'Snapdragon 7s Gen 2', RAM:'12 GB', Сактагыч:'256 GB', Камера:'50 MP Sony', Батарея:'5000 mAh', OS:'Android 14'} },
+  { id:6, name:'Huawei Nova 12 Pro 256GB', brand:'Huawei', cat:'phones', price:34900, oldPrice:null, rating:4, reviews:98, icon:'📱', badge:'new', isNew:true, inStock:true, specs:{Экран:'6.76" OLED', Процессор:'Snapdragon 778G', RAM:'12 GB', Сактагыч:'256 GB', Камера:'60 MP', Батарея:'4600 mAh', OS:'HarmonyOS 4'} },
+
+  { id:7, name:'MacBook Air M2 13" 256GB', brand:'Apple', cat:'laptops', price:89900, oldPrice:99900, rating:5, reviews:512, icon:'💻', badge:'sale', isNew:false, inStock:true, specs:{Экран:'13.6" Liquid Retina', Процессор:'Apple M2', RAM:'8 GB', Сактагыч:'256 GB SSD', Графика:'Apple GPU 8-core', Батарея:'18 саат', OS:'macOS Sonoma'} },
+  { id:8, name:'MacBook Pro M3 Pro 14" 512GB', brand:'Apple', cat:'laptops', price:168000, oldPrice:null, rating:5, reviews:203, icon:'💻', badge:'new', isNew:true, inStock:true, specs:{Экран:'14.2" Liquid Retina XDR', Процессор:'Apple M3 Pro', RAM:'18 GB', Сактагыч:'512 GB SSD', Графика:'Apple GPU 18-core', Батарея:'18 саат', OS:'macOS Sonoma'} },
+  { id:9, name:'ASUS ZenBook 14 OLED', brand:'ASUS', cat:'laptops', price:58500, oldPrice:65000, rating:4, reviews:178, icon:'💻', badge:'sale', isNew:false, inStock:true, specs:{Экран:'14" OLED 2.8K', Процессор:'Intel Core i7-1360P', RAM:'16 GB', Сактагыч:'512 GB SSD', Графика:'Intel Iris Xe', Батарея:'12 саат', OS:'Windows 11'} },
+  { id:10, name:'Lenovo ThinkPad X1 Carbon', brand:'Lenovo', cat:'laptops', price:115000, oldPrice:125000, rating:5, reviews:267, icon:'💻', badge:'sale', isNew:false, inStock:false, specs:{Экран:'14" IPS 2.8K', Процессор:'Intel Core i7-1365U', RAM:'32 GB', Сактагыч:'1 TB SSD', Графика:'Intel Iris Xe', Батарея:'15 саат', OS:'Windows 11 Pro'} },
+  { id:11, name:'HP Spectre x360 14"', brand:'HP', cat:'laptops', price:96000, oldPrice:null, rating:4, reviews:134, icon:'💻', badge:'new', isNew:true, inStock:true, specs:{Экран:'14" OLED 2.8K Touch', Процессор:'Intel Core Ultra 7', RAM:'16 GB', Сактагыч:'1 TB SSD', Графика:'Intel Arc', Батарея:'17 саат', OS:'Windows 11'} },
+
+  { id:12, name:'iPad Air M2 11" 256GB', brand:'Apple', cat:'tablets', price:68900, oldPrice:75000, rating:5, reviews:312, icon:'📟', badge:'sale', isNew:false, inStock:true, specs:{Экран:'11" Liquid Retina', Процессор:'Apple M2', RAM:'8 GB', Сактагыч:'256 GB', Камера:'12 MP', Батарея:'10 саат', OS:'iPadOS 17'} },
+  { id:13, name:'Samsung Galaxy Tab S9+', brand:'Samsung', cat:'tablets', price:89500, oldPrice:null, rating:5, reviews:189, icon:'📟', badge:'new', isNew:true, inStock:true, specs:{Экран:'12.4" Dynamic AMOLED 2X', Процессор:'Snapdragon 8 Gen 2', RAM:'12 GB', Сактагыч:'256 GB', Камера:'13 MP', Батарея:'10090 mAh', OS:'Android 13'} },
+  { id:14, name:'Xiaomi Pad 6 Pro 256GB', brand:'Xiaomi', cat:'tablets', price:32900, oldPrice:38000, rating:4, reviews:145, icon:'📟', badge:'sale', isNew:false, inStock:true, specs:{Экран:'11" IPS 2.8K', Процессор:'Snapdragon 8+ Gen 1', RAM:'8 GB', Сактагыч:'256 GB', Камера:'50 MP', Батарея:'8600 mAh', OS:'Android 13'} },
+
+  { id:15, name:'Sony WH-1000XM5 Bluetooth', brand:'Sony', cat:'audio', price:18500, oldPrice:22000, rating:5, reviews:398, icon:'🎧', badge:'sale', isNew:false, inStock:true, specs:{Туташуу:'Bluetooth 5.2', Батарея:'30 саат', Шум алдын алуу:'Бар (ANC)', Драйвер:'30mm', Жыштык:'4Hz–40kHz', Салмак:'250 г', Гарантия:'2 жыл'} },
+  { id:16, name:'Apple AirPods Pro 2nd Gen', brand:'Apple', cat:'audio', price:22900, oldPrice:26000, rating:5, reviews:567, icon:'🎧', badge:'sale', isNew:false, inStock:true, specs:{Туташуу:'Bluetooth 5.3', Батарея:'6 саат (30 саат кутуча менен)', Шум алдын алуу:'Бар (ANC)', Чип:'Apple H2', Сугарылуучулук:'IP54', Салмак:'5.3 г (ар бир)', Гарантия:'1 жыл'} },
+  { id:17, name:'Xiaomi Buds 5 Pro', brand:'Xiaomi', cat:'audio', price:8900, oldPrice:10500, rating:4, reviews:234, icon:'🎧', badge:'sale', isNew:false, inStock:true, specs:{Туташуу:'Bluetooth 5.3', Батарея:'8 саат (36 саат)', Шум алдын алуу:'Бар (ANC)', Драйвер:'11mm', Сугарылуучулук:'IP54', Салмак:'4.5 г', Гарантия:'1 жыл'} },
+  { id:18, name:'JBL Charge 5 Bluetooth Колонка', brand:'JBL', cat:'audio', price:14500, oldPrice:17000, rating:4, reviews:312, icon:'🔊', badge:'sale', isNew:false, inStock:true, specs:{Туташуу:'Bluetooth 5.1', Батарея:'20 саат', Кубаттуулук:'40W', Сугарылуучулук:'IP67', Чыгаруу:'Стерео', Салмак:'961 г', Гарантия:'1 жыл'} },
+  { id:19, name:'Sony WF-1000XM5', brand:'Sony', cat:'audio', price:19900, oldPrice:null, rating:5, reviews:189, icon:'🎧', badge:'new', isNew:true, inStock:true, specs:{Туташуу:'Bluetooth 5.3', Батарея:'8 саат (24 саат)', Шум алдын алуу:'Бар (ANC)', Чип:'Sony V2+QN2', Сугарылуучулук:'IPX4', Салмак:'5.9 г', Гарантия:'2 жыл'} },
+
+  { id:20, name:'Apple Watch Series 9 45mm', brand:'Apple', cat:'watches', price:42500, oldPrice:48000, rating:5, reviews:203, icon:'⌚', badge:'sale', isNew:false, inStock:true, specs:{Экран:'1.9" Always-On Retina', Процессор:'Apple S9', RAM:'1 GB', Сактагыч:'64 GB', Сугарылуучулук:'WR50', Батарея:'18 саат', OS:'watchOS 10'} },
+  { id:21, name:'Samsung Galaxy Watch 6 44mm', brand:'Samsung', cat:'watches', price:28900, oldPrice:33000, rating:4, reviews:167, icon:'⌚', badge:'sale', isNew:false, inStock:true, specs:{Экран:'1.5" Super AMOLED', Процессор:'Exynos W930', RAM:'2 GB', Сактагыч:'16 GB', Сугарылуучулук:'5ATM+IP68', Батарея:'40 саат', OS:'Wear OS 4'} },
+  { id:22, name:'Xiaomi Smart Band 8 Pro', brand:'Xiaomi', cat:'watches', price:7900, oldPrice:9500, rating:4, reviews:445, icon:'⌚', badge:'sale', isNew:false, inStock:true, specs:{Экран:'1.74" AMOLED', Процессор:'ARM Cortex-M33', RAM:'—', Сактагыч:'—', Сугарылуучулук:'5ATM', Батарея:'14 күн', OS:'MIUI Watch'} },
+
+  { id:23, name:'Canon EOS R50 Kit 18-45mm', brand:'Canon', cat:'cameras', price:56900, oldPrice:64000, rating:4, reviews:67, icon:'📷', badge:'sale', isNew:false, inStock:true, specs:{Матрица:'24.2 MP APS-C', Процессор:'DIGIC X', Экран:'3" Touch', Видео:'4K 30fps', Стабилизация:'Жок', Затвор:'1/4000с', Гарантия:'2 жыл'} },
+  { id:24, name:'Sony A7 IV Mirrorless Body', brand:'Sony', cat:'cameras', price:198000, oldPrice:null, rating:5, reviews:134, icon:'📷', badge:'new', isNew:true, inStock:true, specs:{Матрица:'33 MP Full-Frame', Процессор:'BIONZ XR', Экран:'3" Tilt', Видео:'4K 60fps', Стабилизация:'5-ось IBIS', Затвор:'1/8000с', Гарантия:'2 жыл'} },
+
+  { id:25, name:'PlayStation 5 Disc Edition', brand:'Sony', cat:'gaming', price:52000, oldPrice:58000, rating:5, reviews:445, icon:'🎮', badge:'sale', isNew:false, inStock:true, specs:{Процессор:'AMD Zen 2 8 ядро', Графика:'AMD RDNA 2 10.28 TFLOPS', RAM:'16 GB GDDR6', Сактагыч:'825 GB SSD', Диск:'Blu-ray 4K UHD', Видео:'4K 120fps / 8K', Гарантия:'1 жыл'} },
+  { id:26, name:'Xbox Series X 1TB', brand:'Microsoft', cat:'gaming', price:48000, oldPrice:55000, rating:5, reviews:312, icon:'🎮', badge:'sale', isNew:false, inStock:true, specs:{Процессор:'AMD Zen 2 8 ядро', Графика:'AMD RDNA 2 12 TFLOPS', RAM:'16 GB GDDR6', Сактагыч:'1 TB SSD', Диск:'Blu-ray 4K UHD', Видео:'4K 120fps / 8K', Гарантия:'1 жыл'} },
+  { id:27, name:'Nintendo Switch OLED', brand:'Nintendo', cat:'gaming', price:34500, oldPrice:38000, rating:5, reviews:678, icon:'🎮', badge:'sale', isNew:false, inStock:true, specs:{Экран:'7" OLED', Процессор:'NVIDIA Custom Tegra', RAM:'4 GB', Сактагыч:'64 GB', Батарея:'4.5-9 саат', Видео:'1080p TV / 720p portable', Гарантия:'1 жыл'} },
+  { id:28, name:'Steam Deck OLED 512GB', brand:'Valve', cat:'gaming', price:58000, oldPrice:null, rating:5, reviews:234, icon:'🎮', badge:'new', isNew:true, inStock:true, specs:{Экран:'7.4" HDR OLED', Процессор:'AMD APU Zen 2+RDNA 2', RAM:'16 GB LPDDR5', Сактагыч:'512 GB NVMe', Батарея:'3-12 саат', Видео:'1280x800', Гарантия:'1 жыл'} },
+
+  { id:29, name:'Anker USB-C 140W Зарядник', brand:'Anker', cat:'accessories', price:3200, oldPrice:4000, rating:5, reviews:289, icon:'🔌', badge:'sale', isNew:false, inStock:true, specs:{Кубаттуулук:'140W', Порттор:'2x USB-C + 1x USB-A', Протоколдор:'PD 3.1 / PPS', Кириш:'100-240V', Сугарылуучулук:'Жок', Гарантия:'1 жыл'} },
+  { id:30, name:'Apple MagSafe Зарядкы 15W', brand:'Apple', cat:'accessories', price:4500, oldPrice:null, rating:4, reviews:156, icon:'🔌', badge:'new', isNew:true, inStock:true, specs:{Кубаттуулук:'15W', Туташуу:'MagSafe (магниттик)', Кабел:'1 м', Ылайыктуу:'iPhone 12 жана андан жогору', Гарантия:'1 жыл'} },
+];
+
+let cartCount = 3;
+let currentCat = 'all';
+let currentPage = 1;
+const perPage = 12;
+let filteredProducts = [...products];
+let isListView = false;
+
+// ===== PAGE NAVIGATION =====
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  if(page === 'home') document.getElementById('nav-home').classList.add('active');
+  window.scrollTo(0, 0);
+  if(page === 'home') renderHomeProducts();
+}
+
+function showElec(cat) {
+  currentCat = cat;
+  currentPage = 1;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-elec').classList.add('active');
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('nav-elec').classList.add('active');
+  updateSubCats(cat);
+  applyFilters();
+  window.scrollTo(0, 0);
+}
+
+function filterSubCat(cat) {
+  currentCat = cat;
+  currentPage = 1;
+  updateSubCats(cat);
+  const labels = {all:'Электроника', phones:'Смартфондор', laptops:'Ноутбуктар', tablets:'Планшеттер', audio:'Аудио', watches:'Смарт саат', cameras:'Камералар', gaming:'Оюн консолу', accessories:'Аксессуарлар'};
+  document.getElementById('bread-cat').textContent = labels[cat] || 'Электроника';
+  applyFilters();
+}
+
+function updateSubCats(cat) {
+  document.querySelectorAll('.sub-cat').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('sc-' + cat);
+  if(el) el.classList.add('active');
+}
+
+// ===== FILTERS =====
+function applyFilters() {
+  const minPrice = parseInt(document.getElementById('priceMin').value) || 0;
+  const maxPrice = parseInt(document.getElementById('priceMax').value) || 999999;
+  const sort = document.getElementById('sortSelect').value;
+  const brands = ['apple','samsung','xiaomi','sony','lg','huawei'].filter(b => document.getElementById('b-'+b) && document.getElementById('b-'+b).checked);
+  const onlyNew = document.getElementById('f-new') && document.getElementById('f-new').checked;
+  const onlySale = document.getElementById('f-sale') && document.getElementById('f-sale').checked;
+  const onlyStock = document.getElementById('f-instock') && document.getElementById('f-instock').checked;
+
+  filteredProducts = products.filter(p => {
+    if(currentCat !== 'all' && p.cat !== currentCat) return false;
+    if(p.price < minPrice || p.price > maxPrice) return false;
+    if(brands.length > 0 && !brands.includes(p.brand.toLowerCase())) return false;
+    if(onlyNew && !p.isNew) return false;
+    if(onlySale && !p.oldPrice) return false;
+    if(onlyStock && !p.inStock) return false;
+    return true;
+  });
+
+  if(sort === 'price-asc') filteredProducts.sort((a,b) => a.price - b.price);
+  else if(sort === 'price-desc') filteredProducts.sort((a,b) => b.price - a.price);
+  else if(sort === 'rating') filteredProducts.sort((a,b) => b.rating - a.rating);
+  else if(sort === 'new') filteredProducts.sort((a,b) => b.isNew - a.isNew);
+
+  document.getElementById('resultCount').innerHTML = '<strong>' + filteredProducts.length + '</strong> товар табылды';
+  currentPage = 1;
+  renderElecProducts();
+  renderPagination();
+  updateActiveTags(brands, onlyNew, onlySale);
+}
+
+function updateActiveTags(brands, onlyNew, onlySale) {
+  const wrap = document.getElementById('activeFilters');
+  wrap.innerHTML = '';
+  brands.forEach(b => {
+    wrap.innerHTML += '<span class="filter-tag">' + b.charAt(0).toUpperCase()+b.slice(1) + ' <button onclick="clearBrand(\''+b+'\')">✕</button></span>';
+  });
+  if(onlyNew) wrap.innerHTML += '<span class="filter-tag">Жаңы <button onclick="clearCheck(\'f-new\')">✕</button></span>';
+  if(onlySale) wrap.innerHTML += '<span class="filter-tag">Скидка <button onclick="clearCheck(\'f-sale\')">✕</button></span>';
+}
+
+function clearBrand(b) { document.getElementById('b-'+b).checked = false; applyFilters(); }
+function clearCheck(id) { document.getElementById(id).checked = false; applyFilters(); }
+function clearFilters() {
+  ['apple','samsung','xiaomi','sony','lg','huawei'].forEach(b => { if(document.getElementById('b-'+b)) document.getElementById('b-'+b).checked = false; });
+  ['f-new','f-sale','f-instock','r5','r4','r3'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).checked = false; });
+  document.getElementById('priceMin').value = 500;
+  document.getElementById('priceMax').value = 200000;
+  document.getElementById('priceSlider').value = 200000;
+  applyFilters();
+}
+
+function updatePriceMax(val) {
+  document.getElementById('priceMax').value = val;
+}
+
+function handleSearch(e) { if(e.key === 'Enter') doSearch(); }
+function doSearch() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  if(!q) return;
+  showPage('elec');
+  currentCat = 'all';
+  updateSubCats('all');
+  filteredProducts = products.filter(p => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q));
+  document.getElementById('resultCount').innerHTML = '"<strong>' + q + '</strong>" боюнча ' + filteredProducts.length + ' натыйжа';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-elec').classList.add('active');
+  renderElecProducts();
+  renderPagination();
+  window.scrollTo(0,0);
+}
+
+// ===== RENDER =====
+function productCardHTML(p) {
+  const badgeHTML = p.badge === 'hot' ? '<span class="badge-hot">ХИТ</span>' : p.badge === 'sale' && p.oldPrice ? '<span class="badge-sale">СКИДКА</span>' : p.isNew ? '<span class="badge-new">ЖАҢЫ</span>' : '';
+  const discountPct = p.oldPrice ? Math.round((1 - p.price/p.oldPrice)*100) : 0;
+  const oldPriceHTML = p.oldPrice ? '<span class="price-old">' + p.oldPrice.toLocaleString() + ' с</span><span class="discount">-' + discountPct + '%</span>' : '';
+  const stars = '★'.repeat(p.rating) + '☆'.repeat(5-p.rating);
+  const stockBadge = !p.inStock ? '<div style="font-size:11px;color:#EF4444;margin-bottom:6px;font-weight:600;">⚠ Складда жок</div>' : '';
+  return `
+    <div class="product-card" onclick="showDetail(${p.id})">
+      <div class="product-img">${p.icon}${badgeHTML}<span class="wishlist-btn" onclick="event.stopPropagation();toggleWish(this)">🤍</span></div>
+      <div class="product-info">
+        <div class="product-brand">${p.brand}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="stars">${stars} <span>(${p.reviews})</span></div>
+        <div class="price-row"><span class="price">${p.price.toLocaleString()} с</span>${oldPriceHTML}</div>
+        ${stockBadge}
+        <button class="add-btn" onclick="event.stopPropagation();addToCart(this,'${p.name}')" ${!p.inStock?'disabled style="background:#94A3B8;cursor:not-allowed"':''}>
+          ${p.inStock ? '🛒 Себетке кошуу' : '🔔 Кабарландыруу'}
+        </button>
+      </div>
+    </div>`;
+}
+
+function renderElecProducts() {
+  const grid = document.getElementById('elecGrid');
+  const start = (currentPage-1)*perPage;
+  const paginated = filteredProducts.slice(start, start+perPage);
+  if(paginated.length === 0) {
+    grid.innerHTML = '<div class="no-results" style="grid-column:1/-1"><div class="no-icon">🔍</div><h3>Товар табылган жок</h3><p>Башка фильтр же издөөнү колдонуп көрүңүз</p></div>';
+    return;
+  }
+  grid.innerHTML = paginated.map(productCardHTML).join('');
+}
+
+function renderHomeProducts() {
+  const el = document.getElementById('home-products');
+  if(!el) return;
+  const hot = products.filter(p => p.badge === 'hot' || (p.oldPrice && p.rating >= 4)).slice(0,8);
+  el.innerHTML = hot.map(p => {
+    const badgeHTML = p.badge === 'hot' ? '<span class="badge-hot">ХИТ</span>' : p.oldPrice ? '<span class="badge-sale">СКИДКА</span>' : '';
+    const discountPct = p.oldPrice ? Math.round((1-p.price/p.oldPrice)*100) : 0;
+    const oldHTML = p.oldPrice ? `<span class="price-old">${p.oldPrice.toLocaleString()} с</span><span class="discount">-${discountPct}%</span>` : '';
+    const stars = '★'.repeat(p.rating)+'☆'.repeat(5-p.rating);
+    return `<div class="product-card" onclick="showElec('${p.cat}');setTimeout(()=>showDetail(${p.id}),50)">
+      <div class="product-img">${p.icon}${badgeHTML}<span class="wishlist-btn" onclick="event.stopPropagation();toggleWish(this)">🤍</span></div>
+      <div class="product-info">
+        <div class="product-brand">${p.brand}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="stars">${stars} <span>(${p.reviews})</span></div>
+        <div class="price-row"><span class="price">${p.price.toLocaleString()} с</span>${oldHTML}</div>
+        <button class="add-btn" onclick="event.stopPropagation();addToCart(this,'${p.name}')">🛒 Себетке кошуу</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderPagination() {
+  const total = Math.ceil(filteredProducts.length / perPage);
+  const el = document.getElementById('pagination');
+  if(total <= 1) { el.innerHTML = ''; return; }
+  let html = '';
+  if(currentPage > 1) html += `<button class="page-btn" onclick="goPage(${currentPage-1})">‹</button>`;
+  for(let i=1;i<=total;i++) {
+    if(i===1||i===total||Math.abs(i-currentPage)<=1) {
+      html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    } else if(Math.abs(i-currentPage)===2) html += '<span style="padding:8px 4px;color:var(--muted)">…</span>';
+  }
+  if(currentPage < total) html += `<button class="page-btn" onclick="goPage(${currentPage+1})">›</button>`;
+  el.innerHTML = html;
+}
+
+function goPage(n) { currentPage = n; renderElecProducts(); renderPagination(); window.scrollTo(0,200); }
+
+// ===== DETAIL PAGE =====
+function showDetail(id) {
+  const p = products.find(x => x.id === id);
+  if(!p) return;
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-detail').classList.add('active');
+  document.getElementById('detail-bread').textContent = p.name;
+
+  const discountPct = p.oldPrice ? Math.round((1-p.price/p.oldPrice)*100) : 0;
+  const oldHTML = p.oldPrice ? `<span class="detail-price-old">${p.oldPrice.toLocaleString()} с</span><span class="detail-discount">-${discountPct}%</span>` : '';
+  const stars = '★'.repeat(p.rating)+'☆'.repeat(5-p.rating);
+  const specsHTML = Object.entries(p.specs||{}).map(([k,v]) => `<div class="spec-row"><span class="spec-key">${k}</span><span class="spec-val">${v}</span></div>`).join('');
+  const related = products.filter(x => x.cat === p.cat && x.id !== p.id).slice(0,4);
+
+  document.getElementById('productDetail').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-img">${p.icon}</div>
+      <div class="detail-info">
+        <div class="detail-brand">${p.brand}</div>
+        <div class="detail-name">${p.name}</div>
+        <div class="detail-stars">
+          <span class="stars-big">${stars}</span>
+          <span class="review-count">${p.reviews} пикир</span>
+          ${p.inStock ? '<span style="color:#10B981;font-size:13px;font-weight:600">✓ Складда бар</span>' : '<span style="color:#EF4444;font-size:13px;font-weight:600">✗ Складда жок</span>'}
+        </div>
+        <div class="detail-price-row">
+          <span class="detail-price">${p.price.toLocaleString()} с</span>
+          ${oldHTML}
+        </div>
+        <div class="detail-specs">
+          <h3>Негизги мүнөздөмөлөр</h3>
+          ${specsHTML}
+        </div>
+        <div class="detail-actions">
+          <button class="btn-add-large" onclick="addToCart(this,'${p.name}')" ${!p.inStock?'disabled style="background:#94A3B8;cursor:not-allowed"':''}>🛒 Себетке кошуу</button>
+          <button class="btn-wish-large" onclick="toggleWish(this)">🤍</button>
+        </div>
+        <div class="delivery-info">
+          <div class="delivery-row"><span class="d-icon">🚚</span><div><strong>Акысыз жеткирүү</strong><span>5000 сомдон жогору заказда</span></div></div>
+          <div class="delivery-row"><span class="d-icon">🔄</span><div><strong>14 күн ичинде кайтаруу</strong><span>Эч кандай суроо жок</span></div></div>
+          <div class="delivery-row"><span class="d-icon">🛡️</span><div><strong>${p.specs['Гарантия'] || '1 жыл'} гарантия</strong><span>Өндүрүүчүдөн расмий гарантия</span></div></div>
+          <div class="delivery-row"><span class="d-icon">💳</span><div><strong>24 айга бөлүп төлөө</strong><span>0% комиссия менен</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-tabs">
+      <div class="tab-btns">
+        <button class="tab-btn active" onclick="openTab('desc')">📝 Сүрөттөмө</button>
+        <button class="tab-btn" onclick="openTab('specs')">📊 Мүнөздөмөлөр</button>
+        <button class="tab-btn" onclick="openTab('reviews')">💬 Пикирлер (${p.reviews})</button>
+      </div>
+      <div class="tab-content active" id="tab-desc">
+        <p>${p.brand} компаниясынын <strong>${p.name}</strong> — бул категориясындагы эң мыкты өнүмдөрдүн бири. Жогорку сапаттуу материалдардан жасалган бул товар узак мөөнөткө эсептелген. Заманбап технологиялар жана инновациялык дизайн бирге айкалышып, колдонуучуга эң мыкты тажрыйбаны берет.</p><br>
+        <p>Бул ${p.cat === 'phones' ? 'смартфон' : p.cat === 'laptops' ? 'ноутбук' : p.cat === 'audio' ? 'аудио аппарат' : 'аппарат'} күнүмдүк жашоодо сизге ишенимдүү жардамчы болот. Жогорку өндүрүмдүүлүк жана колдонуунун жеңилдиги — бул ${p.brand} өнүмдөрүнүн негизги белгилери.</p>
+      </div>
+      <div class="tab-content" id="tab-specs">
+        ${specsHTML}
+      </div>
+      <div class="tab-content" id="tab-reviews">
+        <div class="review-card"><div class="review-header"><span class="reviewer">Айгерим К.</span><span class="review-date">2025-04-12</span></div><div class="stars" style="font-size:14px;margin-bottom:6px">★★★★★</div><div class="review-text">Абдан жакшы товар! Сапаты жогору, жеткирүү тез болду. Баасы да башка жерлерге салыштырганда арзан. Кайра сатып алам!</div></div>
+        <div class="review-card"><div class="review-header"><span class="reviewer">Бакыт М.</span><span class="review-date">2025-03-28</span></div><div class="stars" style="font-size:14px;margin-bottom:6px">★★★★☆</div><div class="review-text">Жакшы товар, сүрөттөмөгө дал келет. Бир гана кемчилиги — кутучасы бир аз жыйрылыпты. Товардын өзү мыкты.</div></div>
+        <div class="review-card"><div class="review-header"><span class="reviewer">Нурзат А.</span><span class="review-date">2025-03-15</span></div><div class="stars" style="font-size:14px;margin-bottom:6px">★★★★★</div><div class="review-text">Буга чейин башка дүкөндөрдөн алчумун, бирок ShopKG эң мыкты баа берет. Кайра заказ кылдым!</div></div>
+      </div>
+    </div>
+
+    ${related.length ? `<div style="margin-top:40px"><div class="section-header"><h2 class="section-title">Мага дагы <span>жаккандар</span></h2></div><div class="products-grid">${related.map(r => productCardHTML(r)).join('')}</div></div>` : ''}
+  `;
+  window.scrollTo(0, 0);
+}
+
+function openTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ===== VIEW TOGGLE =====
+function setView(mode) {
+  isListView = mode === 'list';
+  const grid = document.getElementById('elecGrid');
+  grid.classList.toggle('list-view', isListView);
+  document.getElementById('gridViewBtn').classList.toggle('active', !isListView);
+  document.getElementById('listViewBtn').classList.toggle('active', isListView);
+}
+
+// ===== CART & WISHLIST =====
+function addToCart(btn, name) {
+  cartCount++;
+  document.getElementById('cartBadge').textContent = cartCount;
+  showNotification('✅ "' + (name||'Товар') + '" себетке кошулду!');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '✓ Кошулду';
+  btn.style.background = '#10B981';
+  setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+}
+
+function toggleWish(btn) {
+  if(btn.textContent === '🤍') { btn.textContent = '❤️'; showNotification('❤️ Тандалгыларга кошулду!'); }
+  else { btn.textContent = '🤍'; showNotification('💔 Тандалгылардан өчүрүлдү'); }
+}
+
+function showNotification(msg) {
+  const n = document.getElementById('notification');
+  document.getElementById('notif-text').textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 3000);
+}
+
+// ===== INIT =====
+renderHomeProducts();
+applyFilters();
+</script>
+</body>
+</html>
